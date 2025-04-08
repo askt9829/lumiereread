@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressBar = document.getElementById("progress-bar");
     const progressFill = document.getElementById("progress-fill");
     const progressText = document.getElementById("progress-text");
-    const pageFlipSound = document.getElementById("page-flip-sound");
     const clickSound = document.getElementById("click-sound");
     const burgerBtn = document.getElementById("burger-btn");
     const settingsBtn = document.getElementById("settings-btn");
@@ -30,17 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let pages = [];
     let isInterfaceHidden = false;
 
-    // Логирование для отладки
     console.log("settingsBtn:", settingsBtn);
     console.log("settingsPanel:", settingsPanel);
 
     async function loadChapter(chapter) {
         pageContainer.innerHTML = "";
         try {
-            const chapterFileName = chapter.charAt(0).toUpperCase() + chapter.slice(1);
-            const response = await fetch(`/assets/chapters_data/${chapterFileName}.json`);
+            const chapterFileName = chapter;
+            const response = await fetch(`assets/cata/${chapterFileName}.json`);
             if (!response.ok) {
-                throw new Error("JSON-файл не найден");
+                throw new Error(`JSON-файл не найден: ${response.status}`);
             }
             const pageUrls = await response.json();
             totalPages = pageUrls.length;
@@ -56,13 +54,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadVerticalMode(pageUrls) {
         pageContainer.innerHTML = "";
         pageUrls.forEach((url, index) => {
+            console.log(`Loading image from URL: ${url}`);
             const img = document.createElement("img");
             img.src = url;
             img.alt = `Страница ${index + 1}`;
             img.loading = "lazy";
             img.onerror = () => {
-                img.src = "/assets/fallback-image.jpg";
+                console.error(`Failed to load image from URL: ${url}`);
+                img.src = "https://via.placeholder.com/600x800?text=Image+Not+Found";
                 img.alt = "Изображение не загрузилось";
+            };
+            img.onload = () => {
+                console.log(`Image loaded successfully: ${url}`);
             };
             applyFrameSize(img);
             pageContainer.appendChild(img);
@@ -251,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     settingsBtn.addEventListener("click", () => {
-        console.log("Settings button clicked"); // Для отладки
+        console.log("Settings button clicked");
         settingsPanel.classList.toggle("open");
         sidebar.classList.remove("open");
         overlay.classList.toggle("active");
