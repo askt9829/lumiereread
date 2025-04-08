@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let pages = [];
     let isInterfaceHidden = false;
 
+    // Логирование для отладки
     console.log("settingsBtn:", settingsBtn);
     console.log("settingsPanel:", settingsPanel);
 
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pageContainer.innerHTML = "";
         try {
             const chapterFileName = chapter.charAt(0).toUpperCase() + chapter.slice(1);
-            const response = await fetch(`assets/chapters_data/${chapterFileName}.json`); // Относительный путь
+            const response = await fetch(`/assets/chapters_data/${chapterFileName}.json`);
             if (!response.ok) {
                 throw new Error("JSON-файл не найден");
             }
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
             img.alt = `Страница ${index + 1}`;
             img.loading = "lazy";
             img.onerror = () => {
-                img.src = "assets/fallback-image.jpg"; // Относительный путь
+                img.src = "/assets/fallback-image.jpg";
                 img.alt = "Изображение не загрузилось";
             };
             applyFrameSize(img);
@@ -250,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     settingsBtn.addEventListener("click", () => {
-        console.log("Settings button clicked");
+        console.log("Settings button clicked"); // Для отладки
         settingsPanel.classList.toggle("open");
         sidebar.classList.remove("open");
         overlay.classList.toggle("active");
