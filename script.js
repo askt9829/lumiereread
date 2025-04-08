@@ -13,9 +13,12 @@ const progressText = document.getElementById("progress-text");
 const pageFlipSound = document.getElementById("page-flip-sound");
 const clickSound = document.getElementById("click-sound");
 const burgerBtn = document.getElementById("burger-btn");
+const settingsBtn = document.getElementById("settings-btn");
 const sidebar = document.getElementById("sidebar");
+const settingsPanel = document.getElementById("settings-panel");
 const overlay = document.getElementById("overlay");
 const toTopBtn = document.getElementById("to-top-btn");
+const iconContainer = document.querySelector(".icon-container");
 
 let currentChapter = "chapter1";
 let totalPages = null;
@@ -24,16 +27,17 @@ let soundsEnabled = true;
 let scrollSpeedValue = 1;
 let targetScrollSpeed = 1;
 let pages = [];
+let isInterfaceHidden = false;
 
-// Загрузка главы из JSON
 async function loadChapter(chapter) {
     pageContainer.innerHTML = "";
     try {
-        const response = await fetch(`assets/chapters_data/${chapter}.json`);
+        const chapterFileName = chapter.charAt(0).toUpperCase() + chapter.slice(1);
+        const response = await fetch(`assets/chapters_data/${chapterFileName}.json`);
         if (!response.ok) {
             throw new Error("JSON-файл не найден");
         }
-        const pageUrls = await response.json(); // Массив ссылок из JSON
+        const pageUrls = await response.json();
         totalPages = pageUrls.length;
         pages = pageUrls.map((url, index) => ({ url, index }));
         loadVerticalMode(pageUrls);
@@ -44,23 +48,21 @@ async function loadChapter(chapter) {
     }
 }
 
-// Отображение страниц
 function loadVerticalMode(pageUrls) {
     pageContainer.innerHTML = "";
     pageUrls.forEach((url, index) => {
         const img = document.createElement("img");
         img.src = url;
-        img.alt = `Страница ${index + 1}`; // Нумерация для читаемости, не зависит от имени файла
-        img.loading = "lazy"; // Ленивая загрузка
+        img.alt = `Страница ${index + 1}`;
+        img.loading = "lazy";
         img.onerror = () => {
-            img.src = "assets/fallback-image.jpg"; // Запасное изображение при ошибке
+            img.src = "assets/fallback-image.jpg";
             img.alt = "Изображение не загрузилось";
         };
         applyFrameSize(img);
         pageContainer.appendChild(img);
     });
 
-    // Блок в конце главы
     const endMessage = document.createElement("div");
     endMessage.classList.add("end-message");
     endMessage.innerHTML = `
@@ -72,7 +74,6 @@ function loadVerticalMode(pageUrls) {
     `;
     pageContainer.appendChild(endMessage);
 
-    // Навигация между главами
     const prevChapterBtn = document.getElementById("prev-chapter");
     const nextChapterBtn = document.getElementById("next-chapter");
 
@@ -87,7 +88,7 @@ function loadVerticalMode(pageUrls) {
             currentChapter = chapters[currentIndex - 1];
             loadChapter(currentChapter);
             window.location.hash = currentChapter;
-            if (soundsEnabled) clickSound.play();
+            if (soundsEnabled) playClickSound();
         }
     });
 
@@ -96,29 +97,36 @@ function loadVerticalMode(pageUrls) {
             currentChapter = chapters[currentIndex + 1];
             loadChapter(currentChapter);
             window.location.hash = currentChapter;
-            if (soundsEnabled) clickSound.play();
+            if (soundsEnabled) playClickSound();
         }
     });
 
     updateProgressVertical();
+
+    // Добавляем обработчик клика на изображения
+    const images = pageContainer.querySelectorAll("img");
+    images.forEach(img => {
+        img.addEventListener("click", toggleInterface);
+    });
 }
 
-// Применение размера фрейма
 function applyFrameSize(img) {
     const size = frameSize.value;
     if (size === "auto") {
         img.style.maxWidth = "90%";
-        img.style.maxHeight = "auto";
+        img.style.width = "auto";
+        img.style.height = "auto";
     } else if (size === "full") {
         img.style.maxWidth = "100%";
-        img.style.maxHeight = "none";
+        img.style.width = "100%";
+        img.style.height = "auto";
     } else if (size === "compact") {
         img.style.maxWidth = "60%";
-        img.style.maxHeight = "auto";
+        img.style.width = "auto";
+        img.style.height = "auto";
     }
 }
 
-// Обновление прогресс-бара
 function updateProgressVertical() {
     const scrollTop = pageContainer.scrollTop;
     const scrollHeight = pageContainer.scrollHeight - pageContainer.clientHeight;
@@ -128,7 +136,6 @@ function updateProgressVertical() {
     toTopBtn.classList.toggle("visible", scrollTop > 300);
 }
 
-// Подсветка текущей главы
 function updateChapterHighlight() {
     chapterLinks.forEach(link => {
         link.classList.remove("active");
@@ -138,7 +145,6 @@ function updateChapterHighlight() {
     });
 }
 
-// Плавная анимация скорости прокрутки
 function animateScrollSpeed() {
     const diff = targetScrollSpeed - scrollSpeedValue;
     if (Math.abs(diff) > 0.1) {
@@ -149,25 +155,42 @@ function animateScrollSpeed() {
     }
 }
 
-// Навигация по главам через меню
+function playClickSound() {
+    clickSound.currentTime = 0; // Сбрасываем время, чтобы звук воспроизводился без задержки
+    clickSound.play().catch(error => {
+        console.error("Ошибка воспроизведения звука:", error);
+    });
+}
+
+function toggleInterface() {
+    isInterfaceHidden = !isInterfaceHidden;
+    if (isInterfaceHidden) {
+        iconContainer.classList.add("hidden");
+        sidebar.classList.remove("open");
+        settingsPanel.classList.remove("open");
+        overlay.classList.remove("active");
+    } else {
+        iconContainer.classList.remove("hidden");
+    }
+}
+
 chapterLinks.forEach(link => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
         currentChapter = link.dataset.chapter;
         loadChapter(currentChapter);
         window.location.hash = currentChapter;
-        if (soundsEnabled) clickSound.play();
+        if (soundsEnabled) playClickSound();
         sidebar.classList.remove("open");
         overlay.classList.remove("active");
     });
 });
 
-// Изменение размера фрейма
 frameSize.addEventListener("change", () => {
-    loadChapter(currentChapter);
+    const images = pageContainer.querySelectorAll("img");
+    images.forEach(img => applyFrameSize(img));
 });
 
-// Автопрокрутка
 autoScrollBtn.addEventListener("click", () => {
     if (autoScrollActive) {
         autoScrollActive = false;
@@ -196,66 +219,59 @@ function smoothScroll() {
     }
 }
 
-// Включение/выключение звуков
 soundToggle.addEventListener("click", () => {
     soundsEnabled = !soundsEnabled;
     soundToggle.textContent = soundsEnabled ? "Включены" : "Выключены";
 });
 
-// К началу и к концу
 toStartBtn.addEventListener("click", () => {
     pageContainer.scrollTo({ top: 0, behavior: "smooth" });
-    if (soundsEnabled) clickSound.play();
 });
 
 toEndBtn.addEventListener("click", () => {
     pageContainer.scrollTo({ top: pageContainer.scrollHeight, behavior: "smooth" });
-    if (soundsEnabled) clickSound.play();
 });
 
-// Полноэкранный режим
 fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
     } else {
         document.exitFullscreen();
     }
-    if (soundsEnabled) clickSound.play();
 });
 
-// Бургер-меню
 burgerBtn.addEventListener("click", () => {
     sidebar.classList.toggle("open");
+    settingsPanel.classList.remove("open");
     overlay.classList.toggle("active");
-    if (soundsEnabled) clickSound.play();
+});
+
+settingsBtn.addEventListener("click", () => {
+    settingsPanel.classList.toggle("open");
+    sidebar.classList.remove("open");
+    overlay.classList.toggle("active");
 });
 
 overlay.addEventListener("click", () => {
     sidebar.classList.remove("open");
+    settingsPanel.classList.remove("open");
     overlay.classList.remove("active");
-    if (soundsEnabled) clickSound.play();
 });
 
-// Прогресс-бар
 progressBar.addEventListener("click", () => {
     progressBar.classList.toggle("hidden");
-    if (soundsEnabled) clickSound.play();
 });
 
-// Кнопка "наверх"
 toTopBtn.addEventListener("click", () => {
     pageContainer.scrollTo({ top: 0, behavior: "smooth" });
-    if (soundsEnabled) clickSound.play();
 });
 
-// Загрузка при открытии страницы
 window.addEventListener("load", () => {
     const hash = window.location.hash.slice(1) || "chapter1";
     currentChapter = hash;
     loadChapter(currentChapter);
 });
 
-// Обновление прогресса при прокрутке
 pageContainer.addEventListener("scroll", () => {
     updateProgressVertical();
 });
