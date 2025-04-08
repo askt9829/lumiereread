@@ -19,7 +19,7 @@ body {
     align-items: center;
     z-index: 1000;
     box-sizing: border-box;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Плавное скрытие */
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .icon-container.hidden {
@@ -385,7 +385,6 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
     .icon-container {
         padding: 10px;
@@ -535,7 +534,6 @@ body {
     }
 }
 
-/* Для очень маленьких экранов (например, iPhone SE) */
 @media (max-width: 576px) {
     .icon-container {
         padding: 5px;
