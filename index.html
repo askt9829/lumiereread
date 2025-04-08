@@ -2,50 +2,76 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Manga & Manhwa Reader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Reader</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 </head>
 <body>
+    <div class="icon-container">
+        <button id="burger-btn" class="icon-btn">
+            <span class="icon">☰</span>
+        </button>
+        <button id="settings-btn" class="icon-btn">
+            <span class="icon">⚙️</span>
+        </button>
+    </div>
     <div class="container">
-        <button class="burger-btn" id="burger-btn">☰</button>
-        <div class="overlay" id="overlay"></div>
-        <nav class="sidebar" id="sidebar">
+        <div id="overlay" class="overlay"></div>
+        <div id="sidebar" class="sidebar">
             <h2>Сайт от меня</h2>
             <ul id="chapter-list">
                 <li><a href="#chapter1" data-chapter="chapter1">Глава 1</a></li>
                 <li><a href="#chapter2" data-chapter="chapter2">Глава 2</a></li>
                 <li><a href="#chapter3" data-chapter="chapter3">Глава 3</a></li>
+                <li><a href="#chapter4" data-chapter="chapter4">Глава 4</a></li>
+                <li><a href="#chapter5" data-chapter="chapter5">Глава 5</a></li>
+                <li><a href="#chapter6" data-chapter="chapter6">Глава 6</a></li>
+                <li><a href="#chapter7" data-chapter="chapter7">Глава 7</a></li>
+                <li><a href="#chapter8" data-chapter="chapter8">Глава 8</a></li>
+                <li><a href="#chapter9" data-chapter="chapter9">Глава 9</a></li>
+                <li><a href="#chapter10" data-chapter="chapter10">Глава 10</a></li>
+                <li><a href="#chapter11" data-chapter="chapter11">Глава 11</a></li>
+                <li><a href="#chapter12" data-chapter="chapter12">Глава 12</a></li>
+                <li><a href="#chapter13" data-chapter="chapter13">Глава 13</a></li>
+                <li><a href="#chapter14" data-chapter="chapter14">Глава 14</a></li>
+                <li><a href="#chapter15" data-chapter="chapter15">Глава 15</a></li>
+                <li><a href="#chapter16" data-chapter="chapter16">Глава 16</a></li>
+                <li><a href="#chapter17" data-chapter="chapter17">Глава 17</a></li>
+                <li><a href="#chapter18" data-chapter="chapter18">Глава 18</a></li>
+                <li><a href="#chapter19" data-chapter="chapter19">Глава 19</a></li>
+                <li><a href="#chapter20" data-chapter="chapter20">Глава 20</a></li>
             </ul>
+        </div>
+        <div id="settings-panel" class="settings-panel">
+            <h2>Настройки</h2>
             <div class="settings">
-                <label>Размер:</label>
+                <label for="frame-size">Размер:</label>
                 <select id="frame-size">
                     <option value="auto">Авто</option>
-                    <option value="full">Полный</option>
+                    <option value="full">Полный экран</option>
                     <option value="compact">Компактный</option>
                 </select>
-                <label>Автопрокрутка:</label>
+                <label for="auto-scroll">Автопрокрутка:</label>
                 <button id="auto-scroll">Вкл/Выкл</button>
-                <label>Скорость прокрутки:</label>
+                <label for="scroll-speed">Скорость прокрутки:</label>
                 <div class="scroll-speed-container">
                     <input type="range" id="scroll-speed" min="1" max="10" value="1">
                 </div>
-                <label>Звуки:</label>
+                <label for="sound-toggle">Звук:</label>
                 <button id="sound-toggle">Включены</button>
                 <button id="to-start">К началу</button>
                 <button id="to-end">К концу</button>
                 <button id="fullscreen-btn">Полный экран</button>
             </div>
-        </nav>
-        <div class="reader" id="reader">
-            <div class="page-container" id="page-container"></div>
-            <div class="progress-bar" id="progress-bar">
-                <span id="progress-text"></span>
+        </div>
+        <div id="reader" class="reader">
+            <div id="page-container" class="page-container"></div>
+            <div id="progress-bar" class="progress-bar">
                 <div id="progress-fill"></div>
+                <span id="progress-text">Прокручено: 0%</span>
             </div>
-            <button class="to-top-btn" id="to-top-btn">↑</button>
+            <button id="to-top-btn" class="to-top-btn">↑</button>
         </div>
     </div>
     <audio id="page-flip-sound" src="assets/sounds/page-flip.mp3"></audio>
